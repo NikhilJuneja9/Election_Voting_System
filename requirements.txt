@@ -1,0 +1,3 @@
+confluent_kafka
+simplejson
+psycopg2-binary
