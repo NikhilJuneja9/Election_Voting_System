@@ -14,8 +14,8 @@ def create_table(conn,cur):
             candidate_id VARCHAR(255) PRIMARY KEY,
             candidate_name VARCHAR(255),
             party_affiliation VARCHAR(255),
-            biography TEXT
-            campaign_platform TEXT 
+            biography TEXT,
+            campaign_platform TEXT, 
             photo_url TEXT
         )
         """
@@ -57,10 +57,10 @@ def create_table(conn,cur):
 def generate_candidate_data(candidate_number,total_parties):
     response = requests.get(BASE_URL +'&gender=' + ('female' if candidate_number %2 == 1 else 'male') )
     if response.status_code == 200:
-        user_data = response.json()['result'][0]
+        user_data = response.json()['results'][0]
         
         return {
-            'candidate_id':user_data['login']['uvid'],
+            'candidate_id':user_data['login']['uuid'],
             'candidate_name':f"{user_data['name']['first']} {user_data['name']['last']}",
             'party_affiliation': PARTIES[candidate_number % total_parties],
             'biography': 'sab chor hai',
@@ -79,6 +79,7 @@ if __name__ == "__main__":
         cur = conn.cursor()
         
         create_table(conn, cur)
+        print("table created successfully")
         cur.execute(
     """
     SELECT * FROM candidates
@@ -89,16 +90,17 @@ if __name__ == "__main__":
         if len(candidates) == 0:
             for i in range(3):
                 candidate = generate_candidate_data(i,3)
+                print(i)
                 print(candidate)
                 cur.execute(
     """
     INSERT INTO candidates(candidate_id, candidate_name, party_affiliation, biography,campaign_platform,photo_url)
     VALUES(%s, %s, %s, %s, %s, %s)
     """,(
-        candidate['candidate_id'], candidate['candidate_name'],candidate['party_affilication'],
+        candidate['candidate_id'], candidate['candidate_name'],candidate['party_affiliation'],
         candidate['biography'],candidate['campaign_platform'],candidate['photo_url']
     )
                 )
             
     except Exception as e:
-        print(e)
+        print(f"error - {e}")
