@@ -125,7 +125,7 @@ def delivery_report(err,msg):
         print(f"message delivered to topic{ msg.topic()} at partition {msg.partition()}")
         
 if __name__ == "__main__":
-    producer = SerializingProducer({"bootstrap.servers":"localhost:8080"})
+    producer = SerializingProducer({"bootstrap.servers":"localhost:9092"})
     try:
         conn = psycopg2.connect("host=localhost dbname=voting user=postgres password=postgres")
         cur = conn.cursor()
@@ -158,13 +158,17 @@ if __name__ == "__main__":
         for i in range(500): # generating random 500 voters data
             voter_data =  generate_voters_data()
             insert_voters(conn,cur,voter_data)
-            
-            producer.produce(
-                topic="voters-topic",
-                key=voter_data["voter_id"],
-                value=json.dumps(voter_data),
-                on_delivery=delivery_report
-            )
+            try:  
+                producer.produce(
+                    topic="voters-topic",
+                    key=voter_data["voter_id"],
+                    value=json.dumps(voter_data),
+                    on_delivery=delivery_report
+                )
+            except Exception as e:
+              print(f"error while connecting broker with error {e}")
+              
+              
             print(f"Produced voter {i} with data {voter_data}")
             
             producer.flush()
