@@ -4,6 +4,7 @@ import simplejson as json
 import random
 import pytz
 from main import delivery_report
+import time
 
 from datetime import datetime
 
@@ -46,14 +47,15 @@ if __name__ ==  "__main__":
                 if msg.error().code() == KafkaError._PARTITION_EOF: # this error arises when the consumer is reached the end of the commit and there is no  more message 
                     continue
                 else:
-                    print(msg.error())
+                    print(f"error arising in consumer{msg.error()}")
                     break
             else:
+                print("consumer is working fine")
                 voter = json.loads(msg.value().decode('utf-8'))
                 chosen_candidate =  random.choice(candidates)
-                
+                print("candidate is chosen")
                 vote =  voter | chosen_candidate | {
-                    "voting_time": datetime.now(pytz.UTC).strftime("%Y-%m-%d %J:%M:%S"),
+                    "voting_time": datetime.now(pytz.UTC).strftime("%Y-%m-%d %H:%M:%S"),
                     "vote":1
                 }
                 
@@ -74,7 +76,7 @@ if __name__ ==  "__main__":
                     producer.poll(0)
                 except  Exception as e:
                     print(e)
-                    
+            time.sleep(0.5)
     except Exception as e:
         print(e)
     
