@@ -3,3 +3,4 @@ simplejson
 psycopg2-binary
 requests
 pyspark==3.5
+pytz
