@@ -5,3 +5,5 @@ requests
 pyspark==3.5
 pytz
 streamlit
+kafka-python
+matplotlib

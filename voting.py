@@ -76,7 +76,7 @@ if __name__ ==  "__main__":
                     producer.poll(0)
                 except  Exception as e:
                     print(e)
-            time.sleep(0.5)
+            time.sleep(1)
     except Exception as e:
         print(e)
     
